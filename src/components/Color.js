@@ -1,25 +1,17 @@
 import React from 'react';
 
-const Color = (props) => {
-    const {color, setEditColor, toggleEdit, deleteColor} = props;
 
-    const handleDelete = (e) => {
+const Color = ({color, editing, editColor, deleteColor}) => {
+    const handleClick = (e) => {
         e.stopPropagation();
         deleteColor(color);
-        toggleEdit(false);
     }
 
-    const handleEdit = (e) => {
-        setEditColor(color);
-        toggleEdit(true);
-    }
-
-    return(<li data-testid="color" id="color" onClick={handleEdit}>
-
+    return(<li data-testid="color" onClick={() => editColor(color)}>
         <span>
-            <span className="delete" data-testid="delete" onClick={handleDelete}>x</span>
-            {` ${color.color}`}
+            <span className="delete" onClick={handleClick}>x</span> {` ${color.color}`}
         </span>
+        
         <div 
             className="color-box"
             style={{ backgroundColor: color.code.hex }}
