@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import axios from 'axios'
-import {axiosWithAuth} from '../helpers/axiosWithAuth'
 import Color from './Color';
 import EditMenu from './EditMenu';
+import axiosWithAuth from '../helpers/axiosWithAuth'
 
 const initialColor = {
   color: "",
@@ -20,30 +19,32 @@ const ColorList = ({ colors, updateColors }) => {
 
   const saveEdit = e => {
     e.preventDefault();
-    axiosWithAuth().put(`/colors/${colorToEdit.id}`, colorToEdit)
-    .then(res => {
-      console.log(res.data)
-        axiosWithAuth().get('/colors')
-        .then(response => {
-          updateColors(response.data)
+    axiosWithAuth()
+    .put(`/colors/:id`, colorToEdit)
+    .then((res) => {
+      updateColors (
+        colors.map((color) => {
+          if(color.id === res.data.id) {
+            return res.data
+          } else {
+            return color
+          }
         })
+      )
     })
-    .catch(err => {
-      console.log(err.response)
+    .catch((err) => {
+      console.log(err)
     })
   };
 
-  console.log(`colors`, colors)
-
   const deleteColor = color => {
-    axiosWithAuth().delete(`/colors/${color.id}`)
-    .then(res => {
-      console.log(res.data)
-      updateColors(colors.filter(color => color.id !== Number(res.data)))
-
+    axiosWithAuth()
+    .delete(`/colors/${color.id}`)
+    .then((res) => {
+      updateColors(colors.filter((col) => col.id !== Number(res.data)))
     })
-    .catch(err => {
-      console.log(err.response)
+    .catch((error) => {
+      console.log(error)
     })
   };
 
@@ -51,29 +52,9 @@ const ColorList = ({ colors, updateColors }) => {
     <div className="colors-wrap">
       <p>colors</p>
       <ul>
-        {colors.map(color => (
-          <li key={color.color} onClick={() => editColor(color)}>
-            <span>
-              <span 
-                data-testid='color-test'
-                className="delete" 
-                onClick={e => {
-                    e.stopPropagation();
-                    deleteColor(color)
-                  }
-                }
-              >
-                  x
-              </span>{" "}
-              {color.color}
-            </span>
-            <div
-              className="color-box"
-              style={{ backgroundColor: color.code.hex }}
-            />
-          </li>
-        ))}
+        {colors.map(color => <Color key={color.id} editing={editing} color={color} editColor={editColor} deleteColor={deleteColor}/>)}
       </ul>
+      
       { editing && <EditMenu colorToEdit={colorToEdit} saveEdit={saveEdit} setColorToEdit={setColorToEdit} setEditing={setEditing}/> }
 
     </div>
