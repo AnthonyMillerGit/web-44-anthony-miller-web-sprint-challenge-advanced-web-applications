@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor} from "@testing-library/react";
+import { render, screen} from "@testing-library/react";
 import BubblePage from './BubblePage';
 import fetchColorService from '../services/fetchColorService'
 jest.mock('../services/fetchColorService')
