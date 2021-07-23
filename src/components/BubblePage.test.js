@@ -1,6 +1,4 @@
-  import React from 'react';
-import MutationObserver from 'mutationobserver-shim';
-
+import React from 'react';
 import { render, screen, waitFor} from "@testing-library/react";
 import BubblePage from './BubblePage';
 import fetchColorService from '../services/fetchColorService'
