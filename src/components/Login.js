@@ -1,58 +1,75 @@
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import React, {useState, useEffect} from "react";
-import {useHistory} from 'react-router-dom'
+import { useHistory } from 'react-router';
 
-const Login = () => {
-  // make a post request to retrieve a token from the api
-  // when you have handled the token, navigate to the BubblePage route
-  const [user, setUser] = useState(initialState)
-  const {push} = useHistory()
-  const error = "not valid";
-  //replace with error state
+const initialState = {
+  username: 'Lambda',
+  password: 'i<3Lambd4'
+}
 
+const Login = (e) => {
+  const [login, setLogin] = useState(initialState);
+  const [error, setError] = useState();
+  let history = useHistory();
 
-  const handleChange = e => {
-    setUser({
-      ...user,
+  const handleChange = (e) => {
+    setLogin({
+      ...login,
       [e.target.name]: e.target.value
     })
   }
+  // make a post request to retrieve a token from the api
+  // when you have handled the token, navigate to the BubblePage route
 
-  const submitLogin = e => {
-    e.preventDefault()
-    axios.post('http://localhost:5000/api/login', user)
-    .then(res => {
-      console.log(res.data.payload)
-      localStorage.setItem('token', res.data.payload)
-      push('/private-route')
-    })
-    .catch(err => {
-      console.log(err.response)
-    })
+  const Login = (e) => {
+    e.preventDefault();
+    if(login.username === '' || login.password === '') {
+      setError('Please fill our required fields')
+    } else {
+      axios
+      .post(`http://localhost:5000/api/login`, login)
+      .then((res) => {
+        localStorage.setItem("token", res.data.payload);
+        history.push('/protected')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    }
   }
+
+  //useEffect(()=>{
+    // make a post request to retrieve a token from the api
+    // when you have handled the token, navigate to the BubblePage route
+  
+  //});
+  
+  //const error = "";
+  //replace with error state
 
   return (
     <div>
       <h1>Welcome to the Bubble App!</h1>
-      <form onSubmit={submitLogin}>
-        <input 
-          name="username"
-          type="text"
-          placeholder="username"
-          onChange={handleChange}
-        />
-        <input 
-          name="password"
-          type="password"
-          placeholder="password"
-          onChange={handleChange}
-        />
-        <button>Sign in</button>
-      </form>
-      {user.username === "" || user.password === ""
-        &&
-        <p>{error}</p>
-      }
+      <div data-testid="loginForm" className="login-form">
+        <form onSubmit={Login}>
+          <input data-testid='username' 
+            type = 'text'
+            name = 'username'
+            value = {login.username}
+            onChange = {handleChange}
+          />
+
+          <input data-testid="password" 
+            type = 'text'
+            name = 'password'
+            value = {login.password}
+            onChange = {handleChange}
+          />
+          <button>Log in</button>
+        </form>
+      </div>
+
+      <p data-testid="errorMessage" className="error">{error}</p>
     </div>
   );
 };
