@@ -1,66 +1,66 @@
-import React, { useState, useEffect } from "react";
-import axios from 'axios';
-import { useHistory } from 'react-router';
+import axios from "axios";
+import React, { useState } from "react";
 
-const initialState = {
-  username: 'Lambda',
-  password: 'i<3Lambd4'
-}
+const Login = (props) => {
+  const { push } = props.history
 
-const Login = (e) => {
-  const [login, setLogin] = useState(initialState);
-  const [error, setError] = useState();
-  let history = useHistory();
-
-  const handleChange = (e) => {
-    setLogin({
-      ...login,
-      [e.target.name]: e.target.value
+  const initialFormValues = {
+    username: '',
+    password: ''
+  }
+  const [ formValues, setFormValues ] = useState(initialFormValues)
+  
+  const [ error, setError ] = useState('');
+  const handleChange = e => {
+    setFormValues({
+      ...formValues,
+      [e.target.name] : e.target.value
     })
   }
-  // make a post request to retrieve a token from the api
-  // when you have handled the token, navigate to the BubblePage route
 
-  const Login = (e) => {
-    e.preventDefault();
-    if(login.username === '' || login.password === '') {
-      setError('Please fill our required fields')
-    } else {
-      axios
-      .post(`http://localhost:5000/api/login`, login)
-      .then((res) => {
-        localStorage.setItem("token", res.data.payload);
-        history.push('/protected')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-    }
+  const handleSubmit = e => {
+    e.preventDefault()
+    axios.post('http://localhost:5000/api/login', formValues)
+        .then(res => {
+          console.log('login res: ', res)
+          setError('')
+          localStorage.setItem('token', res.data.payload)
+          push('/bubbles')
+        })
+        .catch(err => {
+          setError('Username or Password not valid')
+        })
   }
-
+  
   return (
     <div>
       <h1>Welcome to the Bubble App!</h1>
       <div data-testid="loginForm" className="login-form">
-        <form onSubmit={Login}>
-          <input data-testid='username' 
-            type = 'text'
-            name = 'username'
-            value = {login.username}
-            onChange = {handleChange}
-          />
-
-          <input data-testid="password" 
-            type = 'text'
-            name = 'password'
-            value = {login.password}
-            onChange = {handleChange}
-          />
-          <button>Log in</button>
+        <h2>Log in: </h2>
+        <form onSubmit={handleSubmit}>
+          <label>Username: 
+            <input 
+              type='text'
+              name='username'
+              id='username'
+              value={formValues.username}
+              onChange={handleChange}
+            />
+          </label>
+          <label>Password: 
+            <input 
+              type='password'
+              name='password'
+              id='password'
+              value={formValues.password}
+              onChange={handleChange}
+            />
+          </label>
+          <button id='submit'>Log in</button>
         </form>
       </div>
 
-      <p data-testid="errorMessage" className="error">{error}</p>
+      <p id="error" className="error">{error}</p>
     </div>
   );
 };
